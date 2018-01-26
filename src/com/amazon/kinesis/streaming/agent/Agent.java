@@ -27,6 +27,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+import com.amazon.kinesis.streaming.agent.metrics.IMetricsScope;
+import com.google.common.base.Strings;
 import org.slf4j.Logger;
 
 import com.amazon.kinesis.streaming.agent.config.AgentConfiguration;
@@ -353,6 +355,15 @@ public class Agent extends AbstractIdleService implements IHeartbeatProvider {
     private void emitStatus() {
         try {
             Map<String, Map<String, Object>> metrics = getMetrics();
+
+            if (agentContext.cloudwatchEmitMetrics() && !Strings.isNullOrEmpty(agentContext.getInstanceTag())) {
+
+                IMetricsScope metricsScope = agentContext.beginScope();
+                metricsScope.addDimension(Metrics.INSTANCE_DIMENSION, agentContext.getInstanceTag());
+                metricsScope.addCount("HEARTBEAT", 1);
+                metricsScope.commit();
+            }
+
             if (agentContext.logEmitInternalMetrics()) {
                 if (metrics != null && !metrics.isEmpty()) {
                     try {
