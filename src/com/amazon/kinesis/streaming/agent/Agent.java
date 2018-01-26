@@ -360,7 +360,7 @@ public class Agent extends AbstractIdleService implements IHeartbeatProvider {
 
                 IMetricsScope metricsScope = agentContext.beginScope();
                 metricsScope.addDimension(Metrics.INSTANCE_DIMENSION, agentContext.getInstanceTag());
-                metricsScope.addCount("HEARTBEAT", 1);
+                metricsScope.addCount("HeartBeat", 1);
                 metricsScope.commit();
             }
 
